@@ -38,10 +38,16 @@ class SynTestGui:
         self.delay_entry.insert(0, '2')
 
         self.run_button = tk.Button(self.root, text='Run', command=self.run_test)
-        self.run_button.grid(row=3, column=0, columnspan=2, sticky='w')
+        self.run_button.grid(row=3, column=0, sticky='w')
+
+        self.insert_line_button = tk.Button(self.root, text='Insert Line', command=self.insert_line)
+        self.insert_line_button.grid(row=3, column=1, sticky='w')
+
+        self.clear_output_button = tk.Button(self.root, text='Clear Output', command=self.clear_output)
+        self.clear_output_button.grid(row=3, column=2, sticky='w')
 
         self.output = scrolledtext.ScrolledText(self.root)
-        self.output.grid(row=4, column=0, columnspan=2, sticky='w')
+        self.output.grid(row=4, column=0, columnspan=3, sticky='w')
 
         self.is_running = False
 
@@ -66,20 +72,29 @@ class SynTestGui:
         delay = int(self.delay_entry.get())
 
         while self.is_running:
+            start_time = time.time()
             try:
                 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 s.settimeout(delay)
                 result = s.connect_ex((ip, port))
+                elapsed_time = time.time() - start_time
                 if result == 0:
-                    self.output.insert(tk.END, f"Port is open\n")
+                    self.output.insert(tk.END, f"Port is open - {elapsed_time:.2f} seconds\n")
                 else:
-                    self.output.insert(tk.END, f"Port is not open\n")
+                    self.output.insert(tk.END, f"Port is not open - {elapsed_time:.2f} seconds\n")
             except Exception as e:
-                self.output.insert(tk.END, f"Error: {str(e)}\n")
+                self.output.insert(tk.END, f"Error: {str(e)} - {elapsed_time:.2f} seconds\n")
             finally:
                 s.close()
                 time.sleep(delay)
                 self.output.see(tk.END)  # Scroll to the bottom
+
+    def insert_line(self):
+        self.output.insert(tk.END, "-"*15 + "\n")
+        self.output.see(tk.END)  # Scroll to the bottom
+
+    def clear_output(self):
+        self.output.delete('1.0', tk.END)
 
     def run(self):
         self.root.mainloop()
