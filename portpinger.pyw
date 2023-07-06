@@ -6,6 +6,7 @@ from tkinter import scrolledtext
 import subprocess
 import re
 import platform
+from datetime import datetime
 
 class SynTestGui:
     def __init__(self):
@@ -61,10 +62,13 @@ class SynTestGui:
         if not self.is_running:
             self.is_running = True
             self.run_button.config(text="Stop")
+            self.output.insert(tk.END, f"Start Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
             threading.Thread(target=self.test_loop).start()
         else:
             self.is_running = False
             self.run_button.config(text="Run")
+            self.output.insert(tk.END, f"Stop Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+            self.insert_line()
 
     def test_loop(self):
         ip = self.ip_entry.get()
