@@ -96,12 +96,14 @@ class SynTestGui:
             self.output.insert(tk.END, f"Start Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
             threading.Thread(target=self.test_loop).start()
             threading.Thread(target=self.timer_loop).start()
+            threading.Thread(target=self.timestamp_loop).start()  # Start the timestamp loop
         else:
             self.is_running = False
             self.run_button.config(text="Run")
             self.pause_time = self.elapsed_time
             self.output.insert(tk.END, f"Stop Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
             self.insert_line()
+
 
     def test_loop(self):
         ip = self.ip_entry.get()
@@ -162,6 +164,13 @@ class SynTestGui:
 
     def start(self):
         self.root.mainloop()
+        
+    def timestamp_loop(self):
+        """Inserts a timestamp to the output every 60 seconds."""
+        while self.is_running:
+            time.sleep(60)
+            self.output.insert(tk.END, f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+            self.output.see(tk.END)  # Scroll to bottom
 
 
 if __name__ == '__main__':
